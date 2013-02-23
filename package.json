@@ -2,9 +2,9 @@
 	"name": "minecraft-datavalues",
 	"description": "An API that scrapes http://minecraftdatavalues.com/ and gives useful JSON!",
 	"dependencies": {
-		"request": "2.*",
-		"cheerio": "0.10.*",
-		"express": "3.1.*",
+		"request": "2.x",
+		"cheerio": "0.10.x",
+		"express": "3.1.x",
 		"coffee-script": "*"
 	},
 	"scripts": {
