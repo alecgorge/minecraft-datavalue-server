@@ -1,0 +1,13 @@
+{
+	"name": "minecraft-datavalues",
+	"description": "An API that scrapes http://minecraftdatavalues.com/ and gives useful JSON!",
+	"dependencies": {
+		"request": "2.*",
+		"cheerio": "0.10.*",
+		"express": "3.1.*",
+		"coffee-script": "*"
+	},
+	"scripts": {
+		"start": "coffee ./lib/server.coffee"
+	}
+}
