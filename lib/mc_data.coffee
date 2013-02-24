@@ -1,15 +1,26 @@
 cheerio = require 'cheerio'
 request = require 'request'
 _ 		= require 'underscore'
+fs		= require 'fs'
+AsyncQueue = require 'async-queue'
+{Zipper}= require 'zipper'
 
 page_to_scrape = "http://minecraftdatavalues.com/"
 
 class MinecraftData
 	constructor: () ->
-		@json = {}
+		@base_json = {
+			items: {},
+			ids: [],
+			names: []
+		}
+		@json = _.clone @base_json
 		@images = []
+		@image_names = []
+		@refreshData()
 
 	refreshData: () ->
+		console.log "Refreshing"
 		request uri: page_to_scrape, (err, res, body) =>
 			@processHTML body
 
@@ -19,19 +30,55 @@ class MinecraftData
 
 	processHTML: (html) ->
 		$ = cheerio.load html
-		@_process $('#values table tr td')
+		@_process $, $('#values table tr td')
 
 	resp: (_data) ->
-		return
-			last_update: @lastUpdate.toString()
+		return {
+			last_update: @lastUpdate.toString(),
 			data: _data
+		}
 
 	all: () -> @resp @json
 	ids: () -> @resp @json['ids']
 	names: () -> @resp @json['names']
 	item: (id) -> @resp @json['items'][id]
+	imageNames: () -> @resp @image_names
 
-	_process: (inp) ->
+	downloadImages: (images) ->
+		queue = new AsyncQueue
+
+		that = this
+		fs.mkdir __dirname + '/blocks/', (err) ->
+			_.each images, (v) ->
+				n = v.split('/').pop()
+				f = __dirname + '/blocks/' + n
+
+				that.image_names.push n
+
+				queue.add (err, job) ->
+					job.fail(err) if err
+
+					fs.exists f, (exists) ->
+						if exists
+							return job.success()
+
+						ff = fs.createWriteStream(f)
+						ff.on 'close', () ->
+							console.log 'Saved: ' + n
+							job.success()
+
+						request(v).pipe ff
+
+			queue.add (err, job) ->
+				console.log "Saved all images!"
+				job.success()
+
+			queue.start()
+
+	_process: ($, inp) ->
+		that = @
+		json = _.clone that.base_json
+
 		inp.each ->
 			$this = $ this
 
@@ -40,8 +87,8 @@ class MinecraftData
 			s = $this.attr('tmd').split ':'
 			id = s[1]
 			dataValue = if s.length > 2 then s[2] else false
-			imgSrc = $this.find('img')[0].src
-			name = $this.find('div:eq(2)').text().trim()
+			imgSrc = $this.find('img').eq(0).attr 'src'
+			name = $this.find('div').eq(2).text().trim()
 
 			if dataValue
 				if not json.items[id]
@@ -50,13 +97,15 @@ class MinecraftData
 				json.items[id].subitems.push
 					d: dataValue,
 					itemname: name,
-					image_url: "Blocks/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+					image_url: "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
 			else
 				if not json.items[id]
 					json.items[id] = subitems: []
 
+				json.items[id]["id"] = id
 				json.items[id].item_name = name
-				json.items[id].image_url = "Blocks/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+				json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+				json.items[id].image_url = "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
 
 				json.ids.push id
 				json.names.push name
@@ -72,12 +121,14 @@ class MinecraftData
 
 		if not _.isEqual json, @json
 			@images = []
+			@image_names = []
 			@lastUpdate = new Date
 
-			$.each $('#values img'), (k, $v) ->
+			_.each $('#values img'), ($v, k) =>
 				@images.push "http://minecraftdatavalues.com/" + $($v).attr('src')
 
-			@json = json
+			@downloadImages @images
 
+			@json = json
 
 module.exports = MinecraftData
