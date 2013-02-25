@@ -24,7 +24,7 @@ app.get '/blocks/names.json', (req, res) ->
 app.get '/blocks/ids.json', (req, res) ->
 	res.jsonp mc_data.ids()
 
-app.get '/blocks/:pic_name.png', (req, res) ->
+app.get '/images/:pic_name.png', (req, res) ->
 	f = __dirname + '/blocks/' + req.param('pic_name') + '.png'
 
 	fs.exists f, (exists) ->
