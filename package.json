@@ -1,7 +1,7 @@
 {
 	"name": "minecraft-datavalues",
 	"subdomain": "mc-data",
-	"version": "1.0.0-2",
+	"version": "1.1.0",
 	"engines": {
 		"node": "0.8.*"
 	},
