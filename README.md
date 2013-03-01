@@ -1,4 +1,4 @@
 minecraft-datavalue-server
 ==========================
 
-http://mc-data.alecgorge.com
+http://mc-data.jit.su/
