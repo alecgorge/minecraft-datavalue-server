@@ -31,17 +31,18 @@ class MinecraftData
 		$ = cheerio.load html
 		@_process $, $('#values table tr td')
 
-	resp: (_data) ->
-		return {
-			last_update: @lastUpdate.toString(),
-			data: _data
-		}
+	resp: (_data) -> _data
 
 	all: () -> @resp @json
 	ids: () -> @resp @json['ids']
 	names: () -> @resp @json['names']
 	item: (id) -> @resp @json['items'][id]
-	imageNames: () -> @resp @image_names
+	subItem: (id, data_value) ->
+		return null if not @json['items'][id]
+
+		return _.find @json['items'][id].subitems, (v) -> return v.data_value == data_value
+
+	imageNames: () -> @resp _.map(@image_names, (v) -> return "/images/" + v)
 
 	downloadImages: (images) ->
 		queue = new AsyncQueue
@@ -94,14 +95,15 @@ class MinecraftData
 
 			if dataValue
 				json.items[id].subitems.push
-					d: dataValue,
-					itemname: name,
-					image_url: "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+					data_value: dataValue,
+					item_name: name,
+					pic_name: imgSrc.substring(imgSrc.lastIndexOf('/') + 1),
+					image_url: "/blocks/" + id + "/" + dataValue + "/image/"
 
 			json.items[id]["id"] = id
 			json.items[id].item_name = name
 			json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
-			json.items[id].image_url = "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+			json.items[id].image_url = "/blocks/" + id + "/image/"
 
 			json.ids.push id
 			json.names.push name

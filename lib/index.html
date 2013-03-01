@@ -1,14 +1,155 @@
 <!doctype html>
 <html>
+	
+	<head>
+		<title>Minecraft Data Value API</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://djyhxgczejc94.cloudfront.net/builds/4945f491bb598a67cb8f684c9ebebf6d351e4faa.css"> 
+	</head>
+	
 	<body>
-		<h1>API Endpoints</h1>
-		<ul>
-			<li><a href="/blocks/all.json"><code>/blocks/all.json</code></a></li>
-			<li><a href="/blocks/images.json"><code>/blocks/images.json</code></a></li>
-			<li><a href="/blocks/:id/info.json"><code>/blocks/:id/info.json</code></a></li>
-			<li><a href="/blocks/names.json"><code>/blocks/names.json</code></a></li>
-			<li><a href="/blocks/ids.json"><code>/blocks/ids.json</code></a></li>
-			<li><a href="/images/:pic_name.json"><code>/images/ids.json</code></a></li>
-		</ul>
+		<div class="container">
+			<div class="hero-unit hidden-phone">
+				<h1>Minecraft Data Value API</h1>
+				<p>Get block and item names, data values, variations/subitems and images.
+					<b>For free.</b>&nbsp;Data is pulled and cached from
+					<a href="http://minecraftdatavalues.com">Minecraftdatavalues.com</a> 
+				</p>
+				<p>
+					<a class="btn btn-danger btn-large" href="#docs">Read the API docs <span class="badge badge-inverse">free!</span></a>
+					<a class="btn" href="//github.com/alecgorge/minecraft-datavalue-server">I'm on GitHub: <code>alecgorge/minecraft-datavalue-server</code>!</a> 
+				</p>
+			</div>
+			<a class="btn btn-large btn-primary btn-block visible-phone" href="#"><span class="btn-label">Sign Up Today!</span></a>
+			<div class="container">
+				<h2 id="docs">API Endpoints</h2>
+				<ul>
+					<li>
+						<p>
+							<a href="/blocks/"><code>/blocks/</code></a> — Returns all available information about all blocks/items.</p>
+					</li>
+					<li>
+						<p>
+							<a href="/blocks/images/"><code>/blocks/images/</code></a> — Returns a list of all paths to all the images.</p>
+					</li>
+					<li>
+						<p>
+							<a href="/blocks/names/"><code>/blocks/names/</code></a> — Returns all known block/item names.</p>
+					</li>
+					<li>
+						<p>
+							<a href="/blocks/ids/"><code>/blocks/ids/</code></a> — Returns all known block/item IDs.</p>
+					</li>
+					<li>
+						<p>
+							<a href="/blocks/:id/"><code>/blocks/:id/</code></a> — Returns all available information for a particular block/item ID.</p>
+						<ul>
+							<li>
+								<p>
+									<a href="/blocks/:id/image/"><code>/blocks/:id/image/</code></a> — Returns a 16x16 PNG representation of the block/item.</p>
+								<p></p>
+							</li>
+							<li>
+								<p>
+									<a href="/blocks/:id/:data_value/"><code>/blocks/:id/:data_value/</code></a> — Returns all available information for a particular block/item with the
+									given ID and with the given data value.</p>
+								<p></p>
+								<ul>
+									<li>
+										<p>
+											<a href="/blocks/:id/:data_value/image/"><code>/blocks/:id/:data_value/</code></a> — Returns a 16x16 PNG representation of the block/item with the given
+											ID and the given data value.</p>
+										<p></p>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<p>
+							<a href="/images/:pic_name.png"><code>/images/:pic_name.png</code></a> — Returns a png of the requested image.</p>
+					</li>
+				</ul>
+			</div>
+			<div class="container">
+				<h2>Sample Reponse</h2>
+				<p>All responses come with
+					<code>Etag</code>headers. Please pass that value from that
+					<code>Etag</code>back in your next request as the
+					<code>If-None-Match</code>header. If the request is still the same, the server
+					will respond with a
+					<code>304</code>response with no body.</p>
+				<p>The best way to get a feel for the API is to simply click on one of the
+					links above! But if you insist, here is a sample for
+					<a href="/blocks/6/"><code>/blocks/6/</code></a> :</p>
+				<pre>
+					<code>{
+  "subitems": [
+    {
+      "data_value": "0",
+      "item_name": "Sapling",
+      "pic_name": "6_0.png",
+      "image_url": "/blocks/6/0/image/"
+    },
+    {
+      "data_value": "1",
+      "item_name": "Spruce Sapling",
+      "pic_name": "6_1.png",
+      "image_url": "/blocks/6/1/image/"
+    },
+    {
+      "data_value": "2",
+      "item_name": "Birch Sapling",
+      "pic_name": "6_2.png",
+      "image_url": "/blocks/6/2/image/"
+    }
+  ],
+  "id": "6",
+  "item_name": "Birch Sapling",
+  "pic_name": "6_2.png",
+  "image_url": "/blocks/6/image/"
+}</code>
+				</pre>
+			</div>
+			<div class="container">
+				<h2>JSONP</h2>
+				<p>JSONP is supported, just pass a
+					<code>GET</code>variable called
+					<code>callback</code>with the name of the function to wrap the JSON data with.
+					Here is a sample for
+					<a href="/blocks/6/?callback=jQueryMagick"><code>/blocks/6/?callback=jQueryMagick</code></a> :</p>
+				<pre>
+					<code>jQueryMagick &amp;&amp; jQueryMagick({
+  "subitems": [
+    {
+      "data_value": "0",
+      "item_name": "Sapling",
+      "pic_name": "6_0.png",
+      "image_url": "/blocks/6/0/image/"
+    },
+    {
+      "data_value": "1",
+      "item_name": "Spruce Sapling",
+      "pic_name": "6_1.png",
+      "image_url": "/blocks/6/1/image/"
+    },
+    {
+      "data_value": "2",
+      "item_name": "Birch Sapling",
+      "pic_name": "6_2.png",
+      "image_url": "/blocks/6/2/image/"
+    }
+  ],
+  "id": "6",
+  "item_name": "Birch Sapling",
+  "pic_name": "6_2.png",
+  "image_url": "/blocks/6/image/"
+});</code>
+				</pre>
+			</div>
+		</div>
 	</body>
+
 </html>
