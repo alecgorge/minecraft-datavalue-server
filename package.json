@@ -1,5 +1,10 @@
 {
 	"name": "minecraft-datavalues",
+	"subdomain": "mc-data",
+	"version": "1.0.0-1",
+	"engines": {
+		"node": "0.8.*"
+	},
 	"description": "An API that scrapes http://minecraftdatavalues.com/ and gives useful JSON!",
 	"dependencies": {
 		"request": "2.x",

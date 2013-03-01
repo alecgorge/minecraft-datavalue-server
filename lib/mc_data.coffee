@@ -3,7 +3,6 @@ request = require 'request'
 _ 		= require 'underscore'
 fs		= require 'fs'
 AsyncQueue = require 'async-queue'
-{Zipper}= require 'zipper'
 
 page_to_scrape = "http://minecraftdatavalues.com/"
 
@@ -90,32 +89,29 @@ class MinecraftData
 			imgSrc = $this.find('img').eq(0).attr 'src'
 			name = $this.find('div').eq(2).text().trim()
 
-			if dataValue
-				if not json.items[id]
-					json.items[id] = subitems: []
+			if not json.items[id]
+				json.items[id] = subitems: []
 
+			if dataValue
 				json.items[id].subitems.push
 					d: dataValue,
 					itemname: name,
 					image_url: "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
-			else
-				if not json.items[id]
-					json.items[id] = subitems: []
 
-				json.items[id]["id"] = id
-				json.items[id].item_name = name
-				json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
-				json.items[id].image_url = "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+			json.items[id]["id"] = id
+			json.items[id].item_name = name
+			json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+			json.items[id].image_url = "/images/" + imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
 
-				json.ids.push id
-				json.names.push name
+			json.ids.push id
+			json.names.push name
 
 		json.ids = _.uniq json.ids
 		json.names = (_.uniq(json.names)).sort()
 		json.ids.sort (a, b) ->
 			a = parseInt a
 			b = parseInt b
-			return 1 if a > b
+			return  1 if a > b
 			return -1 if a < b
 			return 0
 
