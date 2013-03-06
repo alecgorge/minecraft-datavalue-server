@@ -86,21 +86,20 @@ class MinecraftData
 
 			s = $this.attr('tmd').split ':'
 			id = s[1]
-			dataValue = if s.length > 2 then s[2] else false
+			dataValue = if s.length > 2 then (if s[2] is "" then "0" else s[2]) else "0"
 			imgSrc = $this.find('img').eq(0).attr 'src'
 			name = $this.find('div').eq(2).text().trim()
 
 			if not json.items[id]
 				json.items[id] = subitems: []
 
-			if dataValue
-				json.items[id].subitems.push
-					data_value: dataValue,
-					item_name: name,
-					pic_name: imgSrc.substring(imgSrc.lastIndexOf('/') + 1),
-					image_url: "/blocks/" + id + "/" + dataValue + "/image/"
+			json.items[id].subitems.push
+				data_value: dataValue,
+				item_name : name,
+				pic_name  : imgSrc.substring(imgSrc.lastIndexOf('/') + 1),
+				image_url : "/blocks/" + id + "/" + dataValue + "/image/"
 
-			if not json.items[id]
+			if dataValue is "0"
 				json.items[id]["id"] = id
 				json.items[id].item_name = name
 				json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
@@ -108,6 +107,11 @@ class MinecraftData
 
 			json.ids.push id
 			json.names.push name
+
+		_.each json.items, (v, i) ->
+			if json.items[i].subitems.length is 1
+				json.items[i].subitems = []
+
 
 		json.ids = _.uniq json.ids
 		json.names = (_.uniq(json.names)).sort()
