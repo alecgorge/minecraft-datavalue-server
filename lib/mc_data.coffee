@@ -100,10 +100,11 @@ class MinecraftData
 					pic_name: imgSrc.substring(imgSrc.lastIndexOf('/') + 1),
 					image_url: "/blocks/" + id + "/" + dataValue + "/image/"
 
-			json.items[id]["id"] = id
-			json.items[id].item_name = name
-			json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
-			json.items[id].image_url = "/blocks/" + id + "/image/"
+			if not json.items[id]
+				json.items[id]["id"] = id
+				json.items[id].item_name = name
+				json.items[id].pic_name = imgSrc.substring(imgSrc.lastIndexOf('/') + 1)
+				json.items[id].image_url = "/blocks/" + id + "/image/"
 
 			json.ids.push id
 			json.names.push name
